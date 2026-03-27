@@ -8,11 +8,7 @@ string(REGEX REPLACE "(.*)/" "" THIS_PACKAGE_NAME "${CMAKE_CURRENT_SOURCE_DIR}")
 if (APPLE)
     # default the architecture to that of the current process
     if (NOT CMAKE_OSX_ARCHITECTURES)
-        set(CMAKE_OSX_ARCHITECTURES x86_64)
-    else()
-        if (CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
-		message( FATAL_ERROR "Building for arm64 not supported yet, abort." )
-        endif()     
+        set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
     endif()
 endif()
 
@@ -20,16 +16,16 @@ endif()
 if (${CMAKE_GENERATOR} MATCHES "Xcode")
          if (${XCODE_VERSION} VERSION_LESS 10)
               message(STATUS "Xcode 10 or higher is required. Please install from the Mac App Store.")
-            return ()
-        endif ()
+             return ()
+         endif ()
 endif ()
 
 
 # Fetch the correct version of the min-api
 message(STATUS "Updating Git Submodules")
 execute_process(
-    COMMAND				git submodule update --init --recursive
-    WORKING_DIRECTORY	"${CMAKE_CURRENT_SOURCE_DIR}"
+     COMMAND			git submodule update --init --recursive
+     WORKING_DIRECTORY	"${CMAKE_CURRENT_SOURCE_DIR}"
 )
 
 
@@ -39,7 +35,7 @@ include(${CMAKE_CURRENT_SOURCE_DIR}/source/min-api/script/min-package.cmake)
 
 # Add the Lib, if it exists
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/source/min-lib/CMakeLists.txt")
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/source/min-lib)
+     add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/source/min-lib)
 endif ()
 
 
@@ -58,15 +54,15 @@ include_directories("${TORCH_INCLUDE_DIRS}")
 # Generate a project for every folder in the "source/projects" folder
 SUBDIRLIST(PROJECT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/source/projects)
 foreach (project_dir ${PROJECT_DIRS})
-    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/source/projects/${project_dir}/CMakeLists.txt")
-        message("Generating: ${project_dir}")
-        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/source/projects/${project_dir})
+     if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/source/projects/${project_dir}/CMakeLists.txt")
+         message("Generating: ${project_dir}")
+         add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/source/projects/${project_dir})
 
 	# Link LibTorch
-        target_link_libraries(${project_dir} PUBLIC "${TORCH_LIBRARIES}")
-        set_property(TARGET ${project_dir} PROPERTY CXX_STANDARD 17)
+         target_link_libraries(${project_dir} PUBLIC "${TORCH_LIBRARIES}")
+         set_property(TARGET ${project_dir} PROPERTY CXX_STANDARD 17)
 
-    endif ()
+     endif ()
 endforeach ()
 
 # Comment the line below if you want automatic cmake regneration enabled
