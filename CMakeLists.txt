@@ -9,10 +9,6 @@ if (APPLE)
     # default the architecture to that of the current process
     if (NOT CMAKE_OSX_ARCHITECTURES)
         set(CMAKE_OSX_ARCHITECTURES x86_64)
-    else()
-        if (CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
-		message( FATAL_ERROR "Building for arm64 not supported yet, abort." )
-        endif()     
     endif()
 endif()
 
