@@ -8,7 +8,7 @@ string(REGEX REPLACE "(.*)/" "" THIS_PACKAGE_NAME "${CMAKE_CURRENT_SOURCE_DIR}")
 if (APPLE)
     # default the architecture to that of the current process
     if (NOT CMAKE_OSX_ARCHITECTURES)
-        set(CMAKE_OSX_ARCHITECTURES "x86_64;arm64")
+        set(CMAKE_OSX_ARCHITECTURES x86_64)
     endif()
 endif()
 
