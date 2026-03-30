@@ -1,73 +1,24 @@
-cmake_minimum_required(VERSION 3.10)
-project(Min-Starter)
+#  CMakeLists.txt
 
-enable_testing()
+cmake_minimum_required(VERSION 3.0)
 
-string(REGEX REPLACE "(.*)/" "" THIS_PACKAGE_NAME "${CMAKE_CURRENT_SOURCE_DIR}")
+# Set project name and type
+project(ml-ddsp LANGUAGES CXX)
 
-if (APPLE)
-    # default the architecture to that of the current process
-    if (NOT CMAKE_OSX_ARCHITECTURES)
-        set(CMAKE_OSX_ARCHITECTURES x86_64)
-    else()
-        if (CMAKE_OSX_ARCHITECTURES MATCHES "arm64")
-		message( FATAL_ERROR "Building for arm64 not supported yet, abort." )
-        endif()     
-    endif()
+# Specify ARM64 architecture support
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm64")
+    message(STATUS "Building for ARM64 architecture")
+else()
+    message(ERROR "Unsupported architecture.")
 endif()
 
+# Include additional directories or libraries if needed
+include_directories(include)
 
-if (${CMAKE_GENERATOR} MATCHES "Xcode")
-         if (${XCODE_VERSION} VERSION_LESS 10)
-              message(STATUS "Xcode 10 or higher is required. Please install from the Mac App Store.")
-            return ()
-        endif ()
-endif ()
-
-
-# Fetch the correct version of the min-api
-message(STATUS "Updating Git Submodules")
-execute_process(
-    COMMAND				git submodule update --init --recursive
-    WORKING_DIRECTORY	"${CMAKE_CURRENT_SOURCE_DIR}"
+# Add your source files here
+set(SOURCES
+    src/main.cpp
+    src/utils.cpp
 )
 
-
-# Misc setup and subroutines
-include(${CMAKE_CURRENT_SOURCE_DIR}/source/min-api/script/min-package.cmake)
-
-
-# Add the Lib, if it exists
-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/source/min-lib/CMakeLists.txt")
-    add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/source/min-lib)
-endif ()
-
-
-# Set cmake policies
-cmake_policy(SET CMP0079 NEW)
-cmake_policy(SET CMP0074 NEW)
-
-
-# Find LibTorch
-set(CMAKE_BUILD_RPATH "@loader_path/../../../../support/;@loader_path/../../../../support/libtorch;@loader_path/../../../../support/libtorch/lib")
-find_package(Torch REQUIRED)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${TORCH_CXX_FLAGS}")
-include_directories("${TORCH_INCLUDE_DIRS}")
-
-
-# Generate a project for every folder in the "source/projects" folder
-SUBDIRLIST(PROJECT_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/source/projects)
-foreach (project_dir ${PROJECT_DIRS})
-    if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/source/projects/${project_dir}/CMakeLists.txt")
-        message("Generating: ${project_dir}")
-        add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/source/projects/${project_dir})
-
-	# Link LibTorch
-        target_link_libraries(${project_dir} PUBLIC "${TORCH_LIBRARIES}")
-        set_property(TARGET ${project_dir} PROPERTY CXX_STANDARD 17)
-
-    endif ()
-endforeach ()
-
-# Comment the line below if you want automatic cmake regneration enabled
-set(CMAKE_SUPPRESS_REGENERATION true)
+add_executable(ml-ddsp ${SOURCES})
