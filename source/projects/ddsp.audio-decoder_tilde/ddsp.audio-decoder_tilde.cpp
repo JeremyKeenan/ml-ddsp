@@ -178,8 +178,8 @@ private:
     
     // model path
     short m_path {};
-    char m_filename[MAX_FILENAME_CHARS] {};
-    char m_model_path[MAX_PATH_CHARS] {};
+    char m_filename[c74::max::MAX_FILENAME_CHARS] {};
+    char m_model_path[c74::max::MAX_PATH_CHARS] {};
     max::t_fourcc m_type {};
     std::vector<max::t_fourcc> m_types {};
 };
